@@ -24,7 +24,7 @@ As a **Marketing Analytics Engineer** for ACIS, my role is to perform data analy
 
 ## Data Description
 
-The historical data spans from **February 2014 to August 2015**, covering detailed information on policies, clients, vehicles, and claims. Below is a high-level overview of the data structure:
+The historical data spans from **February 2014 to August 2015**, covering detailed information on policies, clients, vehicles, and claims. Below is a high-level overview of the data structure. you can find [here](https://drive.google.com/drive/folders/15XUDEaALyohrMHO0MyQ8UtNh6IAYu6je?usp=drive_link):
 
 ### **Policy Information**
 - `UnderwrittenCoverID`, `PolicyID`, `TransactionMonth`
