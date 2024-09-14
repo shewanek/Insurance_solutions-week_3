@@ -159,4 +159,41 @@ class Insurance_EDA:
             plt.title(f'Boxplot for {col}', fontsize=14, fontweight='bold')
             plt.show()
 
+
+    def visualize_key_insights(self):
+        """
+        Generate 3 creative and beautiful plots that capture key insights from the EDA.
+        """
+        # 1. Distribution of Total Premium using a KDE plot
+        plt.figure(figsize=(10, 6))
+        sns.kdeplot(self.df['TotalPremium'], shade=True, color='purple')
+        plt.title('Density Plot of Total Premium', fontsize=16, fontweight='bold')
+        plt.xlabel('Total Premium', fontsize=12)
+        plt.ylabel('Density', fontsize=12)
+        plt.grid(True)
+        plt.tight_layout()
+        plt.show()
+
+        # 2. Scatter Plot with regression between TotalPremium and TotalClaims by PostalCode
+        plt.figure(figsize=(10, 6))
+        sns.scatterplot(x='TotalPremium', y='TotalClaims', hue='PostalCode', data=self.df, palette='coolwarm', alpha=0.7)
+        sns.regplot(x='TotalPremium', y='TotalClaims', data=self.df, scatter=False, color='black')
+        plt.title('Total Premium vs Total Claims by PostalCode', fontsize=16, fontweight='bold')
+        plt.xlabel('Total Premium', fontsize=12)
+        plt.ylabel('Total Claims', fontsize=12)
+        plt.legend(title='Postal Code', bbox_to_anchor=(1.05, 1), loc='upper left')
+        plt.grid(True)
+        plt.tight_layout()
+        plt.show()
+
+        # 3. Boxplot of Total Premium by CoverType
+        plt.figure(figsize=(12, 6))
+        sns.boxplot(x='CoverType', y='TotalPremium', data=self.df, palette='Set2')
+        plt.title('Total Premium by Cover Type', fontsize=16, fontweight='bold')
+        plt.xlabel('Cover Type', fontsize=12)
+        plt.ylabel('Total Premium', fontsize=12)
+        plt.xticks(rotation=45)
+        plt.tight_layout()
+        plt.grid(True)
+        plt.show()
     
