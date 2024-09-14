@@ -6,4 +6,5 @@ __pycache__/
 .Python
 env/
 week_3/
-data/
+data/*
+!data/*.dvc
