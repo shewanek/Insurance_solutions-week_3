@@ -33,7 +33,7 @@ class Insurance_EDA:
         self.df = self.df.drop(columns=list(low_cardinality_cols) + list(high_cardinality_cols))
         
         # 3. Filter for outliers in numeric columns using the IQR method
-        for col in self.df.select_dtypes(include=[np.number]).columns:
+        for col in self.df.select_dtypes(include=['int64', 'float64']).columns:
             Q1 = self.df[col].quantile(0.10)
             Q3 = self.df[col].quantile(0.90)
             IQR = Q3 - Q1
@@ -41,7 +41,7 @@ class Insurance_EDA:
             self.df = self.df[(self.df[col] >= Q1 - outlier_step) & (self.df[col] <= Q3 + outlier_step)]
         
         # 4. Fill missing numeric values with the mean
-        numeric_cols = self.df.select_dtypes(include=[np.number]).columns
+        numeric_cols = self.df.select_dtypes(include=['int64', 'float64']).columns
         self.df[numeric_cols] = self.df[numeric_cols].fillna(self.df[numeric_cols].mean())
         
         # 5. Fill missing categorical values with the mode
@@ -91,8 +91,7 @@ class Insurance_EDA:
         plt.show()
 
         # Correlation matrix for numeric columns
-        numeric_columns = self.df.select_dtypes(include=['float64', 'int64'])
-        correlation_matrix = numeric_columns.corr()
+        correlation_matrix = self.df[['UnderwrittenCoverID', 'PolicyID', 'SumInsured', 'CalculatedPremiumPerTerm', 'TotalPremium','TotalClaims']].corr()
 
         # Plotting the correlation matrix using heatmap
         plt.figure(figsize=(10, 6))
