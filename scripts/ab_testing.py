@@ -58,3 +58,46 @@ class ABHypothesisTesting:
             return "Reject the null hypothesis (statistically significant)."
         else:
             return "Fail to reject the null hypothesis (not statistically significant)."
+
+    def visualize_distribution(self, feature, metric):
+        """
+        Visualize the distribution of a metric (e.g., 'TotalClaims', 'TotalPremium') based on a categorical feature.
+        :param feature: Categorical feature to compare (e.g., 'Province', 'Gender').
+        :param metric: Numeric metric to visualize (e.g., 'TotalClaims', 'ProfitMargin').
+        """
+        plt.figure(figsize=(10, 6))
+        sns.boxplot(x=feature, y=metric, data=self.data)
+        plt.title(f'{metric} Distribution by {feature}')
+        plt.xlabel(feature)
+        plt.ylabel(metric)
+        plt.xticks(rotation=45)
+        plt.tight_layout()
+        plt.show()
+
+    def visualize_bar(self, feature, metric):
+        """
+        Visualize a bar chart to show the mean of a numeric metric grouped by a categorical feature.
+        :param feature: Categorical feature (e.g., 'Province', 'Gender').
+        :param metric: Numeric metric to visualize (e.g., 'TotalClaims', 'ProfitMargin').
+        """
+        plt.figure(figsize=(10, 6))
+        group_means = self.data.groupby(feature)[metric].mean().reset_index()
+        sns.barplot(x=feature, y=metric, data=group_means)
+        plt.title(f'Mean {metric} by {feature}')
+        plt.xlabel(feature)
+        plt.ylabel(f'Mean {metric}')
+        plt.xticks(rotation=45)
+        plt.tight_layout()
+        plt.show()
+
+    def visualize_correlation(self, features):
+        """
+        Visualize the correlation matrix for a list of features.
+        :param features: List of numeric features to include in the correlation matrix.
+        """
+        corr_matrix = self.data[features].corr()
+        plt.figure(figsize=(8, 6))
+        sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', fmt='.2f')
+        plt.title('Correlation Matrix')
+        plt.tight_layout()
+        plt.show()
