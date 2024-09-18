@@ -39,7 +39,6 @@ class InsuranceModeling:
         # Replace comma with period and then convert to float
         self.data['CapitalOutstanding'] = self.data['CapitalOutstanding'].str.replace(',', '.').astype(float)
 
-        
         # 2. Drop low and high cardinality columns
         cardinality = self.data.select_dtypes(include="object").nunique()
         low_cardinality_cols = cardinality[cardinality < low_cardinality_threshold].index
@@ -65,20 +64,81 @@ class InsuranceModeling:
         return self.data
         
     def feature_engineering(self):
-        # Convert 'TransactionMonth' to datetime if not already
-        self.data['TransactionMonth'] = pd.to_datetime(self.data['TransactionMonth'], errors='coerce')
         
         # Create new features
-        self.data['VehicleAge'] = pd.to_datetime('today').year - self.data['RegistrationYear']
+        self.data['VehicleAge'] = 2015 - self.data['RegistrationYear']
         self.data['PremiumPerUnitSumInsured'] = self.data['TotalPremium'] / (self.data['SumInsured'] + 1e-5)
         self.data['ClaimToPremiumRatio'] = self.data['TotalClaims'] / (self.data['TotalPremium'] + 1e-5)
         self.data['VehiclePowerToWeightRatio'] = self.data['kilowatts'] / (self.data['cubiccapacity'] + 1e-5)
 
-        # Extract features from 'TransactionMonth'
-        self.data['TransactionYear'] = self.data['TransactionMonth'].dt.year
-        self.data['TransactionMonthName'] = self.data['TransactionMonth'].dt.month_name()
-        self.data['TransactionQuarter'] = self.data['TransactionMonth'].dt.quarter
-
+        
 
         return self.data
 
+    def encode_categorical_data(self):
+        """
+        Convert categorical data into a numeric format using one-hot encoding.
+        """
+        self.data = pd.get_dummies(self.data, drop_first=True)
+        return self.data
+        
+    def train_test_split(self):
+        """
+        Divide the data into a training set and a test set.
+        """
+        X = self.data.drop(['TotalClaims', 'TotalPremium'], axis=1)
+        y_claims = self.data['TotalClaims']
+        y_premium = self.data['TotalPremium']
+        
+        X_train, X_test, y_claims_train, y_claims_test = train_test_split(X, y_claims, test_size=0.2, random_state=42)
+        X_train_premium, X_test_premium, y_premium_train, y_premium_test = train_test_split(X, y_premium, test_size=0.3, random_state=42)
+        
+        return X_train, X_test, y_claims_train, y_claims_test, X_train_premium, X_test_premium, y_premium_train, y_premium_test
+    
+
+    def build_models(self, X_train, y_train):
+        """
+        Implement Linear Regression, Decision Trees, Random Forests, and XGBoost models.
+        """
+        models = {
+            'Linear Regression': LinearRegression(),
+            'Decision Tree': DecisionTreeRegressor(),
+            'Random Forest': RandomForestRegressor(),
+            'XGBoost': XGBRegressor()
+        }
+        
+        trained_models = {}
+        for name, model in models.items():
+            model.fit(X_train, y_train)
+            trained_models[name] = model
+        
+        return trained_models
+    
+    def evaluate_models(self, models, X_test, y_test):
+        """
+        Evaluate each model using appropriate metrics.
+        """
+        results = {}
+        for name, model in models.items():
+            predictions = model.predict(X_test)
+            mse = mean_squared_error(y_test, predictions)
+            r2 = r2_score(y_test, predictions)
+            results[name] = {'MSE': mse, 'R2': r2}
+        
+        return results
+
+    def analyze_feature_importance(self, model, X_train, feature_names):
+        """
+        Analyze feature importance using SHAP for tree-based models like XGBoost.
+        """
+        explainer = shap.Explainer(model)
+        shap_values = explainer(X_train)
+        
+        # Plot summary
+        shap.summary_plot(shap_values, X_train, feature_names=feature_names)
+
+        # Show feature importance bar plot
+        shap.summary_plot(shap_values, X_train, feature_names=feature_names, plot_type="bar")
+
+    
+    
